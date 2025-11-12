@@ -3,6 +3,7 @@
 # First Time:
 
 git clone https://github.com/CarterCattadoris/CSE389TermProject.git
+
 cd CSE389TermProject
 
 # Git Workflow:
