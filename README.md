@@ -7,7 +7,7 @@ cd academichub
 
 git pull origin main
 
-# ... make your changes ...
+ ... make your changes ...
 
 git add .
 git commit -m "Added calendar feature"
