@@ -13,5 +13,7 @@ git pull origin main
  ... make your changes ...
 
 git add .
+
 git commit -m "Added calendar feature" (add actual description in quotes)
+
 git push origin main
