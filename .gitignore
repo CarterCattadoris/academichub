@@ -1,0 +1,20 @@
+# Ignore config file with sensitive data
+config.php
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore uploaded files (if you add file upload later)
+uploads/*
+!uploads/.gitkeep
