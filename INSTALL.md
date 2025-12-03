@@ -54,6 +54,7 @@
    mysql -u root -p -e "CREATE DATABASE academichub;"
    mysql -u root -p academichub < database/schema.sql
 ```
+NOTE: -p flag not necessary if you have not configured a password for XAMPP, there is no password by default
 
 5. **Configure:**
 ```bash
