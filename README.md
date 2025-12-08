@@ -2,7 +2,7 @@
 
 # First Time:
 
-git clone https://github.com/CarterCattadoris/CSE389TermProject.git
+git clone https://github.com/CarterCattadoris/academichub.git
 
 cd CSE389TermProject
 
