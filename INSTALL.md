@@ -6,7 +6,7 @@
 
 1. **Download the project:**
 ```bash
-   git clone https://github.com/CarterCattadoris/CSE389TermProject.git
+   git clone https://github.com/CarterCattadoris/academichub.git
 ```
    Or download ZIP from GitHub and extract to `C:\xampp\htdocs\`
 
@@ -36,7 +36,7 @@
 1. **Clone repository:**
 ```bash
    cd /opt/lampp/htdocs
-   git clone https://github.com/CarterCattadoris/CSE389TermProject.git academichub
+   git clone https://github.com/CarterCattadoris/academichub.git
 ```
 
 2. **Set permissions:**
@@ -70,7 +70,7 @@ NOTE: -p flag not necessary if you have not configured a password for XAMPP, the
 1. **Clone to MAMP directory:**
 ```bash
    cd /Applications/MAMP/htdocs
-   git clone https://github.com/CarterCattadoris/CSE389TermProject.git academichub
+   git clone https://github.com/CarterCattadoris/academichub.git
 ```
 
 2. **Start MAMP**
