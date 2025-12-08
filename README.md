@@ -1,5 +1,7 @@
 # CSE389TermProject
 
+# For instructions on running, refer to INSTALL.md
+
 # First Time:
 
 git clone https://github.com/CarterCattadoris/academichub.git
