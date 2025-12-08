@@ -1,6 +1,6 @@
 # Academic Hub
 
-For instructions on running, refer to INSTALL.md
+For instructions on running, refer to [INSTALL.md](academichub/INSTALL.md)
 
 # First Time:
 
