@@ -15,6 +15,6 @@ Thumbs.db
 # Ignore logs
 *.log
 
-# Ignore uploaded files (if you add file upload later)
+# Ignore uploaded files
 uploads/*
 !uploads/.gitkeep
