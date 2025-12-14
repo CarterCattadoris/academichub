@@ -1,5 +1,11 @@
 <?php
 // add_event.php
+
+// Make sure the session is started before using $_SESSION
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'config.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -68,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a href="dashboard.php">Dashboard</a>
             <a href="view_events.php">All Events</a>
             <a href="add_event.php" class="active">Add Event</a>
+            <a href="join_class.php">Join Class</a>
         </div>
         
         <div class="section">

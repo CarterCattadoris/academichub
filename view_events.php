@@ -1,5 +1,11 @@
 <?php
 // view_events.php
+
+// Make sure the session is started before using $_SESSION
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'config.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -49,6 +55,7 @@ $events = $stmt->fetchAll();
             <a href="dashboard.php">Dashboard</a>
             <a href="view_events.php" class="active">All Events</a>
             <a href="add_event.php">Add Event</a>
+            <a href="join_class.php">Join Class</a>
         </div>
         
         <div class="section">

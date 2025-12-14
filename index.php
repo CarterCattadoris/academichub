@@ -1,74 +1,55 @@
 <?php
-// index.php
-require_once 'config.php';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-
-    // Simple login - just check if user exists (no password for testing)
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
-
-    if ($user) {
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['username'] = $user['username'];
-        header("Location: dashboard.php");
-        exit;
-    } else {
-        $error = "User not found!";
-    }
-}
+session_start();
+$error = isset($_GET['error']) ? "Invalid username or password." : "";
+$registered = isset($_GET['registered']) ? "Account created! You may now log in." : "";
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Academic Hub - Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - Academic Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="auth-logo-circle">AH</div>
-                <div>
-                    <h1 class="auth-title">AcademicHub</h1>
-                    <p class="auth-subtitle">
-                        Sign in with a demo username to explore the portal.
-                    </p>
-                </div>
-            </div>
 
-            <?php if (isset($error)): ?>
-                <div class="error">
-                    <?php echo htmlspecialchars($error); ?>
-                </div>
-            <?php endif; ?>
+<body class="login-page">
+<div class="auth-wrapper">
+    <div class="auth-card">
 
-            <form method="POST" class="auth-form">
-                <div class="auth-field">
-                    <label for="username">Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        required
-                        placeholder="thomas, carter, aaron, angelo, glenn"
-                    >
-                </div>
-
-                <button type="submit" class="auth-button">
-                    Sign In
-                </button>
-            </form>
-
-            <div class="hint">
-                <p class="hint-label">Demo accounts</p>
-                <p class="hint-users">thomas • carter • aaron • angelo • glenn</p>
+        <div class="auth-header">
+            <div class="auth-logo-circle">AH</div>
+            <div>
+                <h1 class="auth-title">Academic Hub</h1>
+                <p class="auth-subtitle">Login to continue</p>
             </div>
         </div>
+
+        <?php if ($error): ?>
+            <div class="error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
+        <?php if ($registered): ?>
+            <div class="success"><?= htmlspecialchars($registered) ?></div>
+        <?php endif; ?>
+
+        <form class="auth-form" action="dashboard.php" method="POST">
+            <div class="auth-field">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+
+            <div class="auth-field">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button class="auth-button" type="submit">Log In</button>
+        </form>
+
+        <p class="auth-switch">
+            Don’t have an account? <a href="register.php">Create one</a>
+        </p>
+
     </div>
+</div>
+
 </body>
 </html>
