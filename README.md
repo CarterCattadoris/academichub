@@ -1,10 +1,12 @@
-# CSE389TermProject
+# Academic Hub
+
+For instructions on running, refer to [INSTALL.md](INSTALL.md)
 
 # First Time:
 
-git clone https://github.com/CarterCattadoris/CSE389TermProject.git
+git clone https://github.com/CarterCattadoris/academichub.git
 
-cd CSE389TermProject
+cd academichub
 
 # Git Workflow:
 
