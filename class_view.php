@@ -1,6 +1,10 @@
 <?php
 require_once 'config.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // make sure user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
