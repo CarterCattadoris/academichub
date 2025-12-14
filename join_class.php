@@ -28,6 +28,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <div class="nav">
         <a href="dashboard.php">Dashboard</a>
+        <a href="calendar.php">Calendar</a>
         <a href="view_events.php">All Events</a>
         <a href="add_event.php">Add Event</a>
         <a class="active" href="join_class.php">Join Class</a>

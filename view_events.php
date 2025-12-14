@@ -53,6 +53,7 @@ $events = $stmt->fetchAll();
         
         <div class="nav">
             <a href="dashboard.php">Dashboard</a>
+            <a href="calendar.php">Calendar</a>
             <a href="view_events.php" class="active">All Events</a>
             <a href="add_event.php">Add Event</a>
             <a href="join_class.php">Join Class</a>

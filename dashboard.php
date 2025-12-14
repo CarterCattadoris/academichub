@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['first_name'] = $user['first_name'];
-        $_SESSION['role'] = $user['user_role'];   // CORRECT FIELD NAME
+        $_SESSION['role'] = $user['user_role'];
 
     } else {
         header("Location: index.php?error=1");
@@ -90,6 +90,7 @@ $upcoming_events = $stmt->fetchAll();
 
         <div class="nav">
             <a href="dashboard.php" class="active">Dashboard</a>
+            <a href="calendar.php">Calendar</a>
             <a href="view_events.php">All Events</a>
             <a href="add_event.php">Add Event</a>
             <a href="join_class.php">Join Class</a>
@@ -98,7 +99,7 @@ $upcoming_events = $stmt->fetchAll();
         <div class="section">
             <h2>My Classes</h2>
             <?php if (empty($classes)): ?>
-                <p>You aren’t enrolled in any classes yet.</p>
+                <p>You aren't enrolled in any classes yet.</p>
             <?php else: ?>
                 <table class="data-table">
                     <thead>
@@ -107,24 +108,40 @@ $upcoming_events = $stmt->fetchAll();
                             <th>Name</th>
                             <th>Semester</th>
                             <th>Events</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($classes as $class): ?>
                         <tr>
-                            <td><?= htmlspecialchars($class['class_code']) ?></td>
-                            <td><?= htmlspecialchars($class['class_name']) ?></td>
+                            <td>
+                                <a href="class_view.php?class_id=<?= $class['class_id'] ?>" 
+                                   style="color: #007bff; font-weight: bold; text-decoration: none;">
+                                    <?= htmlspecialchars($class['class_code']) ?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="class_view.php?class_id=<?= $class['class_id'] ?>" 
+                                   style="color: #333; text-decoration: none;">
+                                    <?= htmlspecialchars($class['class_name']) ?>
+                                </a>
+                            </td>
                             <td><?= htmlspecialchars($class['semester'].' '.$class['year']) ?></td>
                             <td><?= $class['event_count'] ?></td>
+                            <td>
+                                <a href="class_view.php?class_id=<?= $class['class_id'] ?>" 
+                                   style="padding: 5px 15px; background: #007bff; color: white; 
+                                          text-decoration: none; border-radius: 4px; font-size: 0.9em; 
+                                          display: inline-block;">
+                                    View Class
+                                </a>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             <?php endif; ?>
         </div>
-
-
-        
 
         <div class="section">
             <h2>Upcoming Events</h2>
@@ -144,7 +161,7 @@ $upcoming_events = $stmt->fetchAll();
                     <tbody>
                         <?php foreach ($upcoming_events as $event): ?>
                         <tr>
-                            <td><?= htmlspecialchars($event['event_title']) ?></td>
+                            <td><strong><?= htmlspecialchars($event['event_title']) ?></strong></td>
                             <td><?= htmlspecialchars($event['class_code']) ?></td>
                             <td><?= htmlspecialchars($event['event_type']) ?></td>
                             <td><?= date('M j, Y g:i A', strtotime($event['start_datetime'])) ?></td>
