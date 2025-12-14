@@ -139,9 +139,9 @@ VALUES
 
 INSERT INTO classes (class_name, class_code, semester, year, created_by)
 VALUES 
-    ('Web Programming', 'CSE389', 'Fall', 2024, 1),
-    ('Database Systems', 'CSE381', 'Fall', 2024, 1),
-    ('Software Engineering', 'CSE440', 'Fall', 2024, 1);
+    ('Web Programming', 'CSE389', 'Fall', 2025, 1),
+    ('Database Systems', 'CSE381', 'Fall', 2025, 1),
+    ('Software Engineering', 'CSE440', 'Fall', 2025, 1);
 
 INSERT INTO class_members (class_id, user_id, role)
 VALUES 
