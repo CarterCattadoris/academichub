@@ -1,7 +1,3 @@
--- ============================================
--- COMPLETE SCHEMA WITH TRIGGER VALIDATION
--- ============================================
-
 DROP TABLE IF EXISTS event_reminders;
 DROP TABLE IF EXISTS event_participants;
 DROP TABLE IF EXISTS calendar_events;
@@ -148,36 +144,28 @@ VALUES
     (1, 1, 'student'), (1, 2, 'student'), (1, 3, 'student'),
     (1, 4, 'student'), (1, 5, 'student'), (2, 1, 'student'), (2, 2, 'student');
 
--- Insert events (mostly future, with 1-2 past events)
--- Current time: 12/14/2025 at 3:30 PM
+-- Insert events
 INSERT INTO calendar_events 
     (class_id, creator_user_id, event_title, event_description, event_type, start_datetime, end_datetime, location)
 VALUES
-    -- Past event 1 (already happened)
     (1, 1, 'Midterm Exam', 'Chapters 1-5', 'exam', 
      '2025-12-05 10:00:00', '2025-12-05 12:00:00', 'Room 215'),
     
-    -- Past event 2 (already happened)
     (1, 1, 'Group Study Session', 'Review for midterm', 'study_session', 
      '2025-12-03 18:00:00', '2025-12-03 20:00:00', 'Library'),
     
-    -- Future event 1 (tomorrow)
     (1, 2, 'Project Proposal Due', 'Submit on Blackboard', 'assignment', 
      '2025-12-15 23:59:00', '2025-12-15 23:59:59', 'Online'),
     
-    -- Future event 2 (next week)
     (1, 1, 'Guest Lecture', 'Industry professional', 'other', 
      '2025-12-18 14:00:00', '2025-12-18 15:30:00', 'Auditorium'),
     
-    -- Future event 3 (next week)
     (1, 1, 'Final Exam Review', 'Prepare for finals', 'study_session', 
      '2025-12-20 10:00:00', '2025-12-20 12:00:00', 'Library'),
     
-    -- Future event 4 (end of month)
     (1, 2, 'Final Project Presentation', 'Group presentations', 'project', 
      '2025-12-22 09:00:00', '2025-12-22 11:30:00', 'Room 101'),
     
-    -- Future event 5 (January)
     (2, 1, 'Spring Semester Kickoff', 'Welcome back meeting', 'other', 
      '2026-01-15 13:00:00', '2026-01-15 14:00:00', 'Hall of Languages');
 
