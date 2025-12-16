@@ -1,19 +1,50 @@
 <?php
-// dashboard.php
-require_once 'config.php';
+session_start();
+require_once "config.php";
 
-// Check if logged in
+/*************************************************
+ * LOGIN HANDLER
+ *************************************************/
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['password_hash'])) {
+
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['first_name'] = $user['first_name'];
+        $_SESSION['role'] = $user['user_role'];
+
+    } else {
+        header("Location: index.php?error=1");
+        exit;
+    }
+}
+
+/*************************************************
+ * BLOCK UNAUTHORIZED ACCESS
+ *************************************************/
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
 }
 
-// Get user info
+/*************************************************
+ * LOAD DASHBOARD DATA
+ *************************************************/
+
+// User info
 $stmt = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
-// Get user's classes
+// Class list
 $stmt = $pdo->prepare("
     SELECT c.*, COUNT(ce.event_id) as event_count
     FROM classes c
@@ -25,19 +56,15 @@ $stmt = $pdo->prepare("
 $stmt->execute([$_SESSION['user_id']]);
 $classes = $stmt->fetchAll();
 
-// Get upcoming events
+// Upcoming events
 $stmt = $pdo->prepare("
-    SELECT 
-        ce.*,
-        c.class_name,
-        c.class_code,
-        u.username as creator
+    SELECT ce.*, c.class_name, c.class_code, u.username AS creator
     FROM calendar_events ce
     JOIN classes c ON ce.class_id = c.class_id
     JOIN class_members cm ON c.class_id = cm.class_id
     JOIN users u ON ce.creator_user_id = u.user_id
     WHERE cm.user_id = ?
-        AND ce.start_datetime >= NOW()
+      AND ce.start_datetime >= NOW()
     ORDER BY ce.start_datetime ASC
     LIMIT 10
 ");
@@ -52,69 +79,101 @@ $upcoming_events = $stmt->fetchAll();
 </head>
 <body>
     <div class="container">
+
         <div class="header">
             <h1>Academic Hub Dashboard</h1>
             <div class="user-info">
-                Welcome, <?php echo htmlspecialchars($user['first_name']); ?>!
+                Welcome, <?= htmlspecialchars($user['first_name']) ?>!
                 <a href="logout.php">Logout</a>
             </div>
         </div>
-        
+
         <div class="nav">
-            <a href="dashboard.php">Dashboard</a>
+            <a href="dashboard.php" class="active">Dashboard</a>
+            <a href="calendar.php">Calendar</a>
             <a href="view_events.php">All Events</a>
             <a href="add_event.php">Add Event</a>
+            <a href="join_class.php">Join Class</a>
+            <a href="create_class.php">Create Class</a> 
         </div>
-        
+
         <div class="section">
             <h2>My Classes</h2>
             <?php if (empty($classes)): ?>
-                <p>You're not enrolled in any classes yet.</p>
+                <p>You aren't enrolled in any classes yet.</p>
             <?php else: ?>
-                <table>
-                    <tr>
-                        <th>Class Code</th>
-                        <th>Class Name</th>
-                        <th>Semester</th>
-                        <th>Events</th>
-                    </tr>
-                    <?php foreach ($classes as $class): ?>
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($class['class_code']); ?></td>
-                            <td><?php echo htmlspecialchars($class['class_name']); ?></td>
-                            <td><?php echo htmlspecialchars($class['semester'] . ' ' . $class['year']); ?></td>
-                            <td><?php echo $class['event_count']; ?></td>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Semester</th>
+                            <th>Events</th>
+                            <th>Action</th>
                         </tr>
-                    <?php endforeach; ?>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($classes as $class): ?>
+                        <tr>
+                            <td>
+                                <a href="class_view.php?class_id=<?= $class['class_id'] ?>" 
+                                   style="color: #007bff; font-weight: bold; text-decoration: none;">
+                                    <?= htmlspecialchars($class['class_code']) ?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="class_view.php?class_id=<?= $class['class_id'] ?>" 
+                                   style="color: #333; text-decoration: none;">
+                                    <?= htmlspecialchars($class['class_name']) ?>
+                                </a>
+                            </td>
+                            <td><?= htmlspecialchars($class['semester'].' '.$class['year']) ?></td>
+                            <td><?= $class['event_count'] ?></td>
+                            <td>
+                                <a href="class_view.php?class_id=<?= $class['class_id'] ?>" 
+                                   style="padding: 5px 15px; background: #007bff; color: white; 
+                                          text-decoration: none; border-radius: 4px; font-size: 0.9em; 
+                                          display: inline-block;">
+                                    View Class
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
                 </table>
             <?php endif; ?>
         </div>
-        
+
         <div class="section">
             <h2>Upcoming Events</h2>
             <?php if (empty($upcoming_events)): ?>
                 <p>No upcoming events.</p>
             <?php else: ?>
-                <table>
-                    <tr>
-                        <th>Event</th>
-                        <th>Class</th>
-                        <th>Type</th>
-                        <th>Date/Time</th>
-                        <th>Location</th>
-                    </tr>
-                    <?php foreach ($upcoming_events as $event): ?>
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <td><strong><?php echo htmlspecialchars($event['event_title']); ?></strong></td>
-                            <td><?php echo htmlspecialchars($event['class_code']); ?></td>
-                            <td><?php echo htmlspecialchars($event['event_type']); ?></td>
-                            <td><?php echo date('M j, Y g:i A', strtotime($event['start_datetime'])); ?></td>
-                            <td><?php echo htmlspecialchars($event['location']); ?></td>
+                            <th>Event</th>
+                            <th>Class</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Location</th>
                         </tr>
-                    <?php endforeach; ?>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($upcoming_events as $event): ?>
+                        <tr>
+                            <td><strong><?= htmlspecialchars($event['event_title']) ?></strong></td>
+                            <td><?= htmlspecialchars($event['class_code']) ?></td>
+                            <td><?= htmlspecialchars($event['event_type']) ?></td>
+                            <td><?= date('M j, Y g:i A', strtotime($event['start_datetime'])) ?></td>
+                            <td><?= htmlspecialchars($event['location']) ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
                 </table>
             <?php endif; ?>
         </div>
+
     </div>
 </body>
 </html>

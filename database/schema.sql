@@ -1,7 +1,3 @@
--- ============================================
--- COMPLETE SCHEMA WITH TRIGGER VALIDATION
--- ============================================
-
 DROP TABLE IF EXISTS event_reminders;
 DROP TABLE IF EXISTS event_participants;
 DROP TABLE IF EXISTS calendar_events;
@@ -139,33 +135,42 @@ VALUES
 
 INSERT INTO classes (class_name, class_code, semester, year, created_by)
 VALUES 
-    ('Web Programming', 'CSE389', 'Fall', 2024, 1),
-    ('Database Systems', 'CSE381', 'Fall', 2024, 1),
-    ('Software Engineering', 'CSE440', 'Fall', 2024, 1);
+    ('Web Programming', 'CSE389', 'Fall', 2025, 1),
+    ('Database Systems', 'CSE381', 'Fall', 2025, 1),
+    ('Software Engineering', 'CSE440', 'Fall', 2025, 1);
 
 INSERT INTO class_members (class_id, user_id, role)
 VALUES 
     (1, 1, 'student'), (1, 2, 'student'), (1, 3, 'student'),
     (1, 4, 'student'), (1, 5, 'student'), (2, 1, 'student'), (2, 2, 'student');
 
--- Insert events (all with VALID dates - end AFTER start)
+-- Insert events
 INSERT INTO calendar_events 
     (class_id, creator_user_id, event_title, event_description, event_type, start_datetime, end_datetime, location)
 VALUES
     (1, 1, 'Midterm Exam', 'Chapters 1-5', 'exam', 
-     '2024-12-05 10:00:00', '2024-12-05 12:00:00', 'Room 215'),
+     '2025-12-05 10:00:00', '2025-12-05 12:00:00', 'Room 215'),
     
     (1, 1, 'Group Study Session', 'Review for midterm', 'study_session', 
-     '2024-12-03 18:00:00', '2024-12-03 20:00:00', 'Library'),
+     '2025-12-03 18:00:00', '2025-12-03 20:00:00', 'Library'),
     
     (1, 2, 'Project Proposal Due', 'Submit on Blackboard', 'assignment', 
-     '2024-12-10 23:59:00', '2024-12-10 23:59:59', 'Online'),
+     '2025-12-15 23:59:00', '2025-12-15 23:59:59', 'Online'),
     
     (1, 1, 'Guest Lecture', 'Industry professional', 'other', 
-     '2024-12-08 14:00:00', '2024-12-08 15:30:00', 'Auditorium');
+     '2025-12-18 14:00:00', '2025-12-18 15:30:00', 'Auditorium'),
+    
+    (1, 1, 'Final Exam Review', 'Prepare for finals', 'study_session', 
+     '2025-12-20 10:00:00', '2025-12-20 12:00:00', 'Library'),
+    
+    (1, 2, 'Final Project Presentation', 'Group presentations', 'project', 
+     '2025-12-22 09:00:00', '2025-12-22 11:30:00', 'Room 101'),
+    
+    (2, 1, 'Spring Semester Kickoff', 'Welcome back meeting', 'other', 
+     '2026-01-15 13:00:00', '2026-01-15 14:00:00', 'Hall of Languages');
 
 INSERT INTO event_participants (event_id, user_id, response_status)
 VALUES (1, 1, 'going'), (1, 2, 'going'), (2, 1, 'going'), (3, 2, 'going');
 
 INSERT INTO event_reminders (event_id, user_id, reminder_datetime, reminder_type)
-VALUES (1, 1, '2024-12-04 18:00:00', 'email'), (2, 1, '2024-12-03 12:00:00', 'in_app');
+VALUES (3, 1, '2025-12-15 18:00:00', 'email'), (4, 1, '2025-12-17 12:00:00', 'in_app');

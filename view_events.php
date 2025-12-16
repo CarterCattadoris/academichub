@@ -1,5 +1,11 @@
 <?php
-// view_events.php
+// ==========================
+// Session & Auth Guard
+// ==========================
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'config.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -7,70 +13,172 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Get all events for user's classes
+// ==========================
+// Fetch Events + Permissions
+// ==========================
 $stmt = $pdo->prepare("
     SELECT 
-        ce.*,
+        ce.event_id,
+        ce.event_title,
+        ce.event_description,
+        ce.event_type,
+        ce.start_datetime,
+        ce.end_datetime,
+        ce.location,
+        ce.creator_user_id,
+
+        c.class_id,
         c.class_name,
         c.class_code,
-        u.username as creator,
-        COUNT(ep.participant_id) as participant_count
+
+        u.username AS creator,
+        cm.role AS class_role,
+
+        COUNT(ep.participant_id) AS participant_count
     FROM calendar_events ce
     JOIN classes c ON ce.class_id = c.class_id
-    JOIN class_members cm ON c.class_id = cm.class_id
-    JOIN users u ON ce.creator_user_id = u.user_id
-    LEFT JOIN event_participants ep ON ce.event_id = ep.event_id
-    WHERE cm.user_id = ?
+    JOIN class_members cm 
+        ON c.class_id = cm.class_id 
+        AND cm.user_id = ?
+    JOIN users u 
+        ON ce.creator_user_id = u.user_id
+    LEFT JOIN event_participants ep 
+        ON ce.event_id = ep.event_id
     GROUP BY ce.event_id
     ORDER BY ce.start_datetime DESC
 ");
+
 $stmt->execute([$_SESSION['user_id']]);
 $events = $stmt->fetchAll();
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>All Events - Academic Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>All Events</h1>
-            <div class="user-info">
-                <a href="dashboard.php">Back to Dashboard</a> |
-                <a href="logout.php">Logout</a>
-            </div>
-        </div>
-        
-        <div class="nav">
-            <a href="dashboard.php">Dashboard</a>
-            <a href="view_events.php" class="active">All Events</a>
-            <a href="add_event.php">Add Event</a>
-        </div>
-        
-        <div class="section">
-            <h2>Calendar Events</h2>
-            <?php if (empty($events)): ?>
-                <p>No events found.</p>
-            <?php else: ?>
-                <?php foreach ($events as $event): ?>
-                    <div class="event-card">
-                        <h3><?php echo htmlspecialchars($event['event_title']); ?></h3>
-                        <p><strong>Class:</strong> <?php echo htmlspecialchars($event['class_name']); ?> (<?php echo htmlspecialchars($event['class_code']); ?>)</p>
-                        <p><strong>Type:</strong> <?php echo htmlspecialchars($event['event_type']); ?></p>
-                        <p><strong>When:</strong> <?php echo date('l, F j, Y', strtotime($event['start_datetime'])); ?></p>
-                        <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($event['start_datetime'])); ?> - <?php echo date('g:i A', strtotime($event['end_datetime'])); ?></p>
-                        <p><strong>Location:</strong> <?php echo htmlspecialchars($event['location']); ?></p>
-                        <p><strong>Created by:</strong> <?php echo htmlspecialchars($event['creator']); ?></p>
-                        <p><strong>Participants:</strong> <?php echo $event['participant_count']; ?></p>
-                        <?php if ($event['event_description']): ?>
-                            <p><strong>Description:</strong> <?php echo htmlspecialchars($event['event_description']); ?></p>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+<div class="container events-container">
+
+    <!-- ================= HEADER ================= -->
+    <div class="header">
+        <h1>All Events</h1>
+        <div class="user-info">
+            <a href="dashboard.php">Back to Dashboard</a>
+            <a href="logout.php">Logout</a>
         </div>
     </div>
+
+    <!-- ================= NAV ================= -->
+    <div class="nav">
+        <a href="dashboard.php">Dashboard</a>
+        <a href="calendar.php">Calendar</a>
+        <a href="view_events.php" class="active">All Events</a>
+        <a href="add_event.php">Add Event</a>
+        <a href="join_class.php">Join Class</a>
+    </div>
+
+    <!-- ================= EVENTS ================= -->
+    <div class="section">
+        <h2>Calendar Events</h2>
+
+        <?php if (empty($events)): ?>
+            <p>No events found.</p>
+        <?php else: ?>
+
+            <div class="events-list">
+
+            <?php foreach ($events as $event): ?>
+
+                <?php
+                    // ================= PERMISSIONS =================
+                    $isOwner = ((int)$event['creator_user_id'] === (int)$_SESSION['user_id']);
+                    $isModerator = ($event['class_role'] === 'instructor');
+                    $canModify = ($isOwner || $isModerator);
+
+                    $startTs = strtotime($event['start_datetime']);
+                    $endTs   = strtotime($event['end_datetime']);
+                    $dateStr = date('l, F j, Y', $startTs);
+                    $timeStr = date('g:i A', $startTs) . ' - ' . date('g:i A', $endTs);
+                ?>
+
+                <div class="event-card enhanced-event-card">
+
+                    <!-- HEADER -->
+                    <div class="event-card-header">
+                        <div>
+                            <h3 class="event-title">
+                                <?= htmlspecialchars($event['event_title']) ?>
+                            </h3>
+                            <div class="event-class-line">
+                                <?= htmlspecialchars($event['class_name']) ?>
+                                &middot;
+                                <?= htmlspecialchars($event['class_code']) ?>
+                            </div>
+                        </div>
+                        <span class="event-type-pill">
+                            <?= htmlspecialchars($event['event_type']) ?>
+                        </span>
+                    </div>
+
+                    <!-- META -->
+                    <div class="event-card-meta">
+                        <div class="event-meta-item">
+                            <span class="meta-label">When</span>
+                            <span class="meta-value"><?= $dateStr ?></span>
+                            <span class="meta-subvalue"><?= $timeStr ?></span>
+                        </div>
+
+                        <div class="event-meta-item">
+                            <span class="meta-label">Location</span>
+                            <span class="meta-value"><?= htmlspecialchars($event['location']) ?></span>
+                        </div>
+
+                        <div class="event-meta-item">
+                            <span class="meta-label">Created by</span>
+                            <span class="meta-value"><?= htmlspecialchars($event['creator']) ?></span>
+                            <span class="meta-subvalue">
+                                <?= (int)$event['participant_count'] ?> participant(s)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <?php if (!empty($event['event_description'])): ?>
+                        <p class="event-description">
+                            <?= htmlspecialchars($event['event_description']) ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <!-- ACTIONS (EDIT and DELETE) -->
+                    <?php if ($canModify): ?>
+                        <div class="event-actions">
+                            <a href="edit_event.php?event_id=<?= $event['event_id'] ?>"
+                               class="btn-edit">
+                                Edit
+                            </a>
+                            
+                            <a href="delete_event.php?event_id=<?= $event['event_id'] ?>"
+                               class="btn-delete"
+                               onclick="return confirm('Are you sure you want to delete this event?');">
+                                Delete
+                            </a>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+
+            <?php endforeach; ?>
+
+            </div>
+
+        <?php endif; ?>
+    </div>
+
+</div>
 </body>
 </html>
