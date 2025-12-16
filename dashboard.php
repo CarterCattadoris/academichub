@@ -94,6 +94,7 @@ $upcoming_events = $stmt->fetchAll();
             <a href="view_events.php">All Events</a>
             <a href="add_event.php">Add Event</a>
             <a href="join_class.php">Join Class</a>
+            <a href="create_class.php">Create Class</a> 
         </div>
 
         <div class="section">

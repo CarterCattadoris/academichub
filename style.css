@@ -239,7 +239,38 @@ table {
     margin-bottom: 15px;
     border-radius: 8px;
     border-left: 4px solid var(--color-primary);
+} 
+
+/* Event action buttons layout   */
+
+
+.event-actions {
+    display: flex;
+    flex-direction: column;   /* STACK VERTICALLY */
+    gap: 8px;                 /* SPACE BETWEEN BUTTONS */
+    margin-top: 12px;
+    align-items: flex-start;  /* LEFT ALIGN */
 }
+
+.btn-edit,
+.btn-delete {
+    width: fit-content;
+    padding: 6px 12px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-radius: 6px;
+}
+
+.btn-edit {
+    background-color: #2f80ed;
+    color: white;
+}
+
+.btn-delete {
+    background-color: #e74c3c;
+    color: white;
+}
+
 
 /* Messages */
 

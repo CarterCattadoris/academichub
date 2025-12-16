@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once 'config.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -7,15 +6,19 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id   = $_SESSION['user_id'];
+$class_code = strtoupper(trim($_POST['class_code'] ?? ''));
+$semester   = trim($_POST['semester'] ?? '');
+$year       = intval($_POST['year'] ?? 0);
 
-$class_code = $_POST['class_code'] ?? '';
-$semester = $_POST['semester'] ?? '';
-$year = $_POST['year'] ?? '';
+if ($class_code === '' || $semester === '' || $year <= 0) {
+    header("Location: join_class.php?error=missing");
+    exit;
+}
 
-// Look up class by code + semester + year
+// 1) Find the class (must already exist)
 $stmt = $pdo->prepare("
-    SELECT class_id 
+    SELECT class_id
     FROM classes
     WHERE class_code = ? AND semester = ? AND year = ?
 ");
@@ -23,29 +26,28 @@ $stmt->execute([$class_code, $semester, $year]);
 $class = $stmt->fetch();
 
 if (!$class) {
-    die("Class not found. Check code, semester, and year.");
+    header("Location: join_class.php?error=notfound");
+    exit;
 }
 
 $class_id = $class['class_id'];
 
-// Check if already enrolled
-$stmt = $pdo->prepare("
-    SELECT 1 
-    FROM class_members 
-    WHERE user_id = ? AND class_id = ?
-");
-$stmt->execute([$user_id, $class_id]);
+// 2) Prevent duplicate membership (unique_member exists in schema)
+try {
+    $stmt = $pdo->prepare("
+        INSERT INTO class_members (class_id, user_id, role)
+        VALUES (?, ?, 'student')
+    ");
+    $stmt->execute([$class_id, $user_id]);
 
-if ($stmt->fetch()) {
-    die("You are already enrolled in this class.");
+} catch (PDOException $e) {
+    // Duplicate membership
+    if ($e->getCode() === '23000') {
+        header("Location: dashboard.php?joined=already");
+        exit;
+    }
+    die("Join failed: " . $e->getMessage());
 }
-
-// Enroll user
-$stmt = $pdo->prepare("
-    INSERT INTO class_members (user_id, class_id, role)
-    VALUES (?, ?, 'student')
-");
-$stmt->execute([$user_id, $class_id]);
 
 header("Location: dashboard.php?joined=1");
 exit;
